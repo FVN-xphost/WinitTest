@@ -135,29 +135,13 @@ fn init_logging() {
 pub fn desktop_main() {
     init_logging();
     run().expect("Lifecycle run started is failed in Desktop!");
-    // let event_loop = winit::event_loop::EventLoop::<AppEvent>::with_user_event()
-    //     .build()
-    //     .unwrap();
-    // let event_proxy = event_loop.create_proxy();
-    // std::thread::spawn(move || {
-    //     loop {
-    //         std::thread::sleep(std::time::Duration::from_millis(1000 / WINDOW_TICK));
-    //         if event_proxy.send_event(AppEvent::FrameTick).is_err() {
-    //             break;
-    //         }
-    //     }
-    // });
-    // let mut app = App::new();
-    // event_loop.run_app(&mut app).unwrap();
 }
 // Android 入口
 #[cfg(target_os = "android")]
-use slint::android;
-#[cfg(target_os = "android")]
 #[unsafe(no_mangle)]
-pub fn android_main(app: android::android_activity::AndroidApp) {
+pub fn android_main(app: slint::android::android_activity::AndroidApp) {
     init_logging();
-    android::init(app).unwrap();
+    slint::android::init(app).expect("Lifecycle run init is failed in Android!");
     run().expect("Lifecycle run started is failed in Android!");
 }
 
