@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
+  # 构建打包桌面
   build-desktop:
     permissions:
       contents: write
@@ -61,7 +62,7 @@ jobs:
         if: ${{ matrix.os == 'linux' }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y libasound2-dev libx11-dev libxcursor-dev libxi-dev libgl1-mesa-dev pkg-config
+          sudo apt-get install -y libasound2-dev libfontconfig1-dev libx11-dev libxcursor-dev libxi-dev libgl1-mesa-dev pkg-config
           sudo apt-get install -y xdg-utils
       # 开始生成图标
       - name: Generated icon
@@ -139,7 +140,7 @@ jobs:
           name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
           path: target/${{ matrix.target }}/release/ren-rs-refactor-desktop.exe
           if-no-files-found: error
-
+  # 构建打包 Android
   build-android:
     permissions:
       contents: write
@@ -222,7 +223,7 @@ jobs:
           name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
           path: gen/android/app/build/outputs/apk/universal/release/app-universal-release.apk
           if-no-files-found: error
-
+  # 构建打包 iOS
   build-ios:
     permissions:
       contents: write
