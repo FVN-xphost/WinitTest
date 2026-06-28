@@ -152,11 +152,12 @@ pub fn desktop_main() {
 }
 // Android 入口
 #[cfg(target_os = "android")]
-use winit::platform::android::activity::AndroidApp;
+use slint::android;
 #[cfg(target_os = "android")]
 #[unsafe(no_mangle)]
-pub fn android_main(app: AndroidApp) {
+pub fn android_main(app: android::android_activity::AndroidApp) {
     init_logging();
+    android::init(app).unwrap();
     run().expect("Lifecycle run started is failed in Android!");
 }
 

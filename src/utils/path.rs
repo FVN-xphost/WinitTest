@@ -19,18 +19,19 @@ pub fn get_config_path() -> Option<String> {
 pub fn get_config_local_dir() -> Option<PathBuf> {
     #[cfg(target_os = "android")]
     {
-        use std::ffi::CStr;
-        use std::os::unix::ffi::OsStrExt;
+        // use std::ffi::CStr;
+        // use std::os::unix::ffi::OsStrExt;
 
-        let uid = unsafe { libc::getuid() };
-        let pwd = unsafe { libc::getpwuid(uid) };
-        if pwd.is_null() {
-            return None;
-        }
+        // let uid = unsafe { libc::getuid() };
+        // let pwd = unsafe { libc::getpwuid(uid) };
+        // if pwd.is_null() {
+        //     return None;
+        // }
 
-        let home_dir = unsafe { CStr::from_ptr((*pwd).pw_dir) };
-        let path = std::path::OsStr::from_bytes(home_dir.to_bytes());
-        return Some(PathBuf::from(path).join("files"));
+        // let home_dir = unsafe { CStr::from_ptr((*pwd).pw_dir) };
+        // let path = std::path::OsStr::from_bytes(home_dir.to_bytes());
+        // return Some(PathBuf::from(path).join("files"));
+        return None;
     }
     #[cfg(target_os = "ios")]
     {
@@ -40,7 +41,7 @@ pub fn get_config_local_dir() -> Option<PathBuf> {
                 .join("Application Support"),
         )
     }
-    #[cfg(not(all(target_os = "android", target_os = "ios")))]
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
     {
         dirs::data_local_dir()
     }
