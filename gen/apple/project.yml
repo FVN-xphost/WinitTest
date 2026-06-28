@@ -80,6 +80,7 @@ targets:
       - sdk: Security.framework
       - sdk: UIKit.framework
       - sdk: CoreAudio.framework
+      - sdk: CoreText.framework
       - sdk: AudioToolbox.framework
       - sdk: Foundation.framework
     preBuildScripts:
