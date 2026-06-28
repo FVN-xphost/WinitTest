@@ -1,0 +1,141 @@
+name: Build PC Actions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Windows x86_64
+          - os: windows
+            arch: x86_64
+            runs: windows-latest
+            target: x86_64-pc-windows-msvc
+          # Windows aarch64
+          - os: windows
+            arch: aarch64
+            runs: windows-11-arm
+            target: aarch64-pc-windows-msvc
+          # Windows i686
+          - os: windows
+            arch: i686
+            runs: windows-latest
+            target: i686-pc-windows-msvc
+          # macOS aarch64
+          - os: macos
+            arch: aarch64
+            runs: macos-latest
+            target: aarch64-apple-darwin
+          # macOS x86_64
+          - os: macos
+            arch: x86_64
+            runs: macos-15-intel
+            target: x86_64-apple-darwin
+          # Linux x86_64
+          - os: linux
+            arch: x86_64
+            runs: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          # Linux aarch64
+          - os: linux
+            arch: aarch64
+            runs: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+
+    runs-on: ${{ matrix.runs }}
+    steps:
+      - uses: actions/checkout@v6
+      # 安装 Rust stable 版本
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+      # 为 Linux 添加部分依赖
+      - name: Install Linux dependencies
+        if: ${{ matrix.os == 'linux' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libx11-dev libxcursor-dev libxi-dev libgl1-mesa-dev pkg-config
+          sudo apt-get install -y xdg-utils
+      # 开始生成图标
+      - name: Generated icon
+        run: |
+          cargo install tauri-cli
+          mkdir -p src-tauri
+          echo '{"bundle":{"icon":["icons/32x32.png","icons/128x128.png","icons/128x128@2x.png","icons/icon.icns","icons/icon.ico"]}}' > src-tauri/tauri.conf.json
+          cargo tauri icon ./app-icon.png
+          mv src-tauri/icons/icon.png ./icon.png
+      # 移动图标（仅 Windows）
+      - name: Moving Icon (Only Windows)
+        if: ${{ matrix.os == 'windows' }}
+        run: |
+          mv src-tauri/icons/icon.ico ./icon.ico
+      # 开始打包正常的可执行文件
+      - name: Build the app
+        run: cargo build --release --target ${{ matrix.target }}
+      # 单独处理一下 macOS 的 .app 文件
+      - name: Bundle macOS App file
+        if: ${{ matrix.os == 'macos' }}
+        run: |
+          APP_DIR=target/${{ matrix.target }}/release/bundle/macos/ren-rs-refactor-desktop.app
+          mkdir -p $APP_DIR/Contents/MacOS
+          cp target/${{ matrix.target }}/release/ren-rs-refactor-desktop $APP_DIR/Contents/MacOS/ren-rs-refactor-desktop
+          cat << EOF > $APP_DIR/Contents/Info.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleDevelopmentRegion</key>
+              <string>en</string>
+              <key>CFBundleExecutable</key>
+              <string>ren-rs-refactor-desktop</string>
+              <key>CFBundleIdentifier</key>
+              <string>com.xphost.ren-rs-refactor</string>
+              <key>CFBundleName</key>
+              <string>Ren Rs Refactor</string>
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+              <key>CFBundleShortVersionString</key>
+              <string>1.0</string>
+              <key>CFBundleVersion</key>
+              <string>1.0</string>
+              <key>CFBundleIconFile</key>
+              <string>AppIcon</string>
+              <key>HighResolutionCapable</key>
+              <true/>
+              <key>CFBundleInfoDictionaryVersion</key>
+              <string>6.0</string>
+          </dict>
+          </plist>
+          EOF
+          echo "APPL????" > $APP_DIR/Contents/PkgInfo
+          mkdir -p $APP_DIR/Contents/Resources
+          cp src-tauri/icons/icon.icns $APP_DIR/Contents/Resources/AppIcon.icns
+      # 上传三个工件！
+      - name: Upload the Linux app
+        if: ${{ matrix.os == 'linux' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
+          path: target/${{ matrix.target }}/release/ren-rs-refactor-desktop
+          if-no-files-found: error
+      - name: Upload the macOS app
+        if: ${{ matrix.os == 'macos' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
+          path: target/${{ matrix.target }}/release/bundle/macos
+          if-no-files-found: error
+      - name: Upload the Windows app
+        if: ${{ matrix.os == 'windows' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bundle-${{ matrix.os }}-${{ matrix.arch }}
+          path: target/${{ matrix.target }}/release/ren-rs-refactor-desktop.exe
+          if-no-files-found: error

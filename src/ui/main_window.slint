@@ -1,0 +1,181 @@
+import { Button, VerticalBox, Slider, CheckBox } from "std-widgets.slint";
+import { GlowText } from "./components/my_light_text.slint";
+import { MyMenuButton } from "./components/my_menu_button.slint";
+
+export global Settings {
+    in-out property <int> volume: 100;
+    in-out property <int> text-speed: 100;
+    in-out property <bool> fullscreen: false;
+}
+
+export component MainWindow inherits Window {
+    preferred-width: 1280px;
+    preferred-height: 720px;
+    background: black;
+    title: "Ren Rs Refactor";
+    in-out property <bool> settings-visible: false;
+    in-out property <float> settings-opacity: 0;
+    in-out property <float> bg-opacity: 0;
+    in-out property <float> buttons-opacity: 0;
+    in-out property <float> overlay-opacity: 0;
+    in-out property <bool> settings-show: false;
+
+    callback start-game-clicked();
+    callback exit-clicked();
+    callback save-settings();
+    callback settings-clicked();
+    callback return-clicked();
+
+    Rectangle {
+        property <bool> is-wide: parent.width / parent.height > 16 / 9;
+        width: is-wide ? parent.height * 16 / 9 : parent.width;
+        height: is-wide ? parent.height : parent.width * 9 / 16;
+
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+
+        property <length> cqi: self.width / 100;
+        property <length> cqb: self.height / 100;
+
+        Rectangle {
+            width: 100%;
+            height: 100%;
+            background: #2a2a40;
+            opacity: root.bg-opacity;
+            animate opacity { duration: 3s; }
+
+            GlowText {
+                text: "主界面背景 (16:9)";
+                font-size: 5 * cqi;
+                glow-color: #00ffff;
+                glow-opacity: 0.8;
+                text-color: #0000FF;
+            }
+        }
+
+        VerticalBox {
+            opacity: root.buttons-opacity;
+            animate opacity { duration: 3s; }
+            alignment: center;
+            x: parent.width - self.width - 10 * cqi;
+            y: (parent.height - self.height) / 2;
+            width: 20 * cqi;
+            spacing: 4 * cqb;
+            MyMenuButton {
+                b-text: "开始游戏";
+                b-width: 8 * cqi;
+                b-height: 3 * cqi;
+                b-font-size: 2 * cqi;
+                b-click => {
+                    root.start-game-clicked();
+                }
+            }
+
+            MyMenuButton {
+                b-text: "设置";
+                b-width: 8 * cqi;
+                b-height: 3 * cqi;
+                b-font-size: 2 * cqi;
+                b-click => {
+                    root.settings-visible = true;
+                    root.settings-clicked();
+                }
+            }
+
+            MyMenuButton {
+                b-text: "退出";
+                b-width: 8 * cqi;
+                b-height: 3 * cqi;
+                b-font-size: 2 * cqi;
+                b-click => {
+                    root.exit-clicked();
+                }
+            }
+        }
+
+        Rectangle {
+            background: black;
+            width: 100%;
+            height: 100%;
+            opacity: root.overlay-opacity;
+            animate opacity { duration: 2s; }
+            z: 10;
+        }
+
+        Rectangle {
+            background: rgba(0, 0, 0, 0.4);
+            opacity: root.settings-opacity;
+            animate opacity { duration: 1s; }
+            z: 10;
+            visible: root.settings-show;
+            TouchArea {
+                width: 100%;
+                height: 100%;
+            }
+
+            Rectangle {
+                width: 60 * cqi;
+                height: 70 * cqb;
+                x: (parent.width - self.width) / 2;
+                y: (parent.height - self.height) / 2;
+                background: #88eeaa33;
+                border-radius: 10 * cqi;
+                border-width: 1 * cqi;
+                border-color: brown;
+
+                VerticalBox {
+                    padding: 5 * cqb;
+                    spacing: 2 * cqb;
+
+                    Text {
+                        text: "音乐音量 (" + Settings.volume + "%)";
+                        font-size: 2 * cqi;
+                    }
+
+                    Slider {
+                        minimum: 0;
+                        maximum: 100;
+                        value: Settings.volume;
+                        changed(v) => {
+                            Settings.volume = v;
+                            root.save-settings();
+                        }
+                    }
+
+                    Text {
+                        text: "文字速度 (" + Settings.text-speed + "%)";
+                        font-size: 2 * cqi;
+                    }
+
+                    Slider {
+                        minimum: 0;
+                        maximum: 100;
+                        value: Settings.text-speed;
+                        changed(v) => {
+                            Settings.text-speed = v;
+                            root.save-settings();
+                        }
+                    }
+
+                    CheckBox {
+                        text: "是否全屏";
+                        checked: Settings.fullscreen;
+                        toggled => {
+                            Settings.fullscreen = !Settings.fullscreen;
+                            root.save-settings();
+                        }
+                    }
+                }
+
+                Button {
+                    text: "返回";
+                    x: parent.width - self.width - 10 * cqi;
+                    y: parent.height - self.height - 6 * cqb;
+                    clicked => {
+                        root.return-clicked();
+                    }
+                }
+            }
+        }
+    }
+}

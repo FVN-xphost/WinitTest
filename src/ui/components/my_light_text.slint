@@ -1,0 +1,127 @@
+// import { Text } from "std-widgets.slint";
+
+export component GlowText inherits Rectangle {
+    in property <string> text: "发光文字";
+    in property <length> font-size: 12px;
+    in property <color> text-color: white;          // 主文字颜色
+    in property <color> glow-color: #00ffff;   // 发光颜色 (比如青色)
+    in property <float> glow-opacity: 0.6;     // 光晕透明度
+    in property <length> spread: 2px;          // 光晕扩散范围 (模拟模糊半径)
+
+    // 为了模拟柔和的光晕，我们铺 8 个方向的光晕层
+    // 左
+    Text {
+        text: root.text;
+        color: root.glow-color;
+        font-size: root.font-size;
+        opacity: root.glow-opacity;
+        x: -root.spread;
+        y: 0;
+        width: root.width;
+        height: root.height;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+    // 右
+    Text {
+        text: root.text;
+        color: root.glow-color;
+        font-size: root.font-size;
+        opacity: root.glow-opacity;
+        x: root.spread;
+        y: 0;
+        width: root.width;
+        height: root.height;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+    // 上
+    Text {
+        text: root.text;
+        color: root.glow-color;
+        font-size: root.font-size;
+        opacity: root.glow-opacity;
+        x: 0;
+        y: -root.spread;
+        width: root.width;
+        height: root.height;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+    // 下
+    Text {
+        text: root.text;
+        color: root.glow-color;
+        font-size: root.font-size;
+        opacity: root.glow-opacity;
+        x: 0;
+        y: root.spread;
+        width: root.width;
+        height: root.height;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+    // 四个对角线方向
+    Text {
+        text: root.text;
+        color: root.glow-color;
+        font-size: root.font-size;
+        opacity: root.glow-opacity * 0.7;
+        x: root.spread * 0.7;
+        y: root.spread * 0.7;
+        width: root.width;
+        height: root.height;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+
+    Text {
+        text: root.text;
+        color: root.glow-color;
+        font-size: root.font-size;
+        opacity: root.glow-opacity * 0.7;
+        x: -root.spread * 0.7;
+        y: root.spread * 0.7;
+        width: root.width;
+        height: root.height;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+
+    Text {
+        text: root.text;
+        color: root.glow-color;
+        font-size: root.font-size;
+        opacity: root.glow-opacity * 0.7;
+        x: root.spread * 0.7;
+        y: -root.spread * 0.7;
+        width: root.width;
+        height: root.height;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+
+    Text {
+        text: root.text;
+        color: root.glow-color;
+        font-size: root.font-size;
+        opacity: root.glow-opacity * 0.7;
+        x: -root.spread * 0.7;
+        y: -root.spread * 0.7;
+        width: root.width;
+        height: root.height;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+
+    // 最上层的主文字 (清晰的)
+    Text {
+        text: root.text;
+        color: root.text-color;
+        font-size: root.font-size;
+        width: root.width;
+        height: root.height;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+}
