@@ -11,19 +11,20 @@ pub fn set_config_local_dir() -> Option<()> {
             PathBuf::from(std::env::var("HOME").ok()?)
                 .join("Library")
                 .join("Application Support")
-                .join(PACKAGE_IDENTIFIER),
-        )
+                .join(PACKAGE_IDENTIFIER)
+                .join("files"),
+        );
+        Some(())
     }
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     {
         CONFIG_LOCAL_DIR
-            .set(dirs::data_local_dir()?.join(PACKAGE_IDENTIFIER))
+            .set(
+                dirs::data_local_dir()?
+                    .join(PACKAGE_IDENTIFIER)
+                    .join("files"),
+            )
             .ok()?;
         Some(())
-        // if let Some(path) = dirs::data_local_dir() {
-        //     Some(path.join(PACKAGE_IDENTIFIER))
-        // } else {
-        //     None
-        // }
     }
 }

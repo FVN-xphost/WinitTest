@@ -3,6 +3,7 @@ use slint::{Timer, TimerMode};
 mod utils;
 
 use utils::config::Config;
+#[allow(unused)]
 use utils::constant::*;
 #[cfg(not(target_os = "android"))]
 use utils::path::set_config_local_dir;
@@ -11,15 +12,16 @@ use utils::path::set_config_local_dir;
 use std::time::Duration;
 fn run() -> Result<(), slint::PlatformError> {
     let app = MainWindow::new()?;
-    // let config = Config::new();
-    // if let Some(config) = config {}
-    // let settings_global = app.global::<Settings>();
-    // settings_global.set_volume(config.volume);
-    // settings_global.set_text_speed(config.text_speed);
-    // settings_global.set_fullscreen(config.fullscreen);
-
-    // app.window().set_fullscreen(config.fullscreen)?;
-
+    let mut config = Config::new();
+    let _ = config.load();
+    let settings_global = app.global::<Settings>();
+    settings_global.set_volume(config.volume);
+    settings_global.set_text_speed(config.text_speed);
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    {
+        settings_global.set_is_fullscreen(config.is_fullscreen);
+        app.window().set_fullscreen(config.is_fullscreen);
+    }
     let app_weak = app.as_weak();
     let timer = Timer::default();
     timer.start(
@@ -92,23 +94,20 @@ fn run() -> Result<(), slint::PlatformError> {
         }
     });
 
-    // let app_weak = app.as_weak();
-    // app.on_save_settings(move || {
-    //     let app = app_weak.upgrade().unwrap();
-    //     let settings_global = app.global::<Settings>();
-
-    //     let current_config = Config {
-    //         volume: settings_global.get_volume(),
-    //         text_speed: settings_global.get_text_speed(),
-    //         fullscreen: settings_global.get_fullscreen(),
-    //     };
-
-    //     current_config.save();
-    //     app.window().set_fullscreen(current_config.fullscreen)?;
-
-    //     Ok::<(), slint::PlatformError>(())
-    // })
-    // .unwrap();
+    let app_weak = app.as_weak();
+    app.on_save_settings(move || {
+        let app = app_weak.upgrade().unwrap();
+        let settings_global = app.global::<Settings>();
+        let mut current_config = Config {
+            volume: settings_global.get_volume(),
+            text_speed: settings_global.get_text_speed(),
+            #[cfg(not(any(target_os = "android", target_os = "ios")))]
+            is_fullscreen: settings_global.get_is_fullscreen(),
+        };
+        let _ = current_config.save();
+        #[cfg(not(any(target_os = "android", target_os = "ios")))]
+        app.window().set_fullscreen(current_config.is_fullscreen);
+    });
 
     app.run()?;
     Ok(())
@@ -133,10 +132,10 @@ fn init_logging() {
 }
 
 // 桌面入口
-#[cfg(not(target_os = "android"))]
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 pub fn desktop_main() {
     init_logging();
-    set_config_local_dir();
+    set_config_local_dir().expect("Lifecycle run set config local dir is failed in Android!");
     run().expect("Lifecycle run started is failed in Desktop!");
 }
 // Android 入口
@@ -160,6 +159,6 @@ pub fn android_main(app: slint::android::android_activity::AndroidApp) {
 #[unsafe(no_mangle)]
 pub extern "C" fn ios_main() {
     init_logging();
-    set_config_local_dir();
+    set_config_local_dir().expect("Lifecycle run set config local dir is failed in Android!");
     run().expect("Lifecycle run started is failed in iOS!");
 }

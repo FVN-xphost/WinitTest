@@ -14,11 +14,11 @@ declare -A pattern_map=(
     ["--project_name"]="ren-rs-refactor"
     ["--project_underline_name"]="ren_rs_refactor"
     ["--project_stylized_name"]="Ren Rs Refactor"
+    ["--project_identifier"]="com.xphost.renrsrefactor"
     ["--project_version"]="0.1.0"
     ["--project_author"]="xphost <xphost@foxmail.com>"
     ["--project_description"]="VN Engine for Ren Rs!"
     ["--project_license"]="Apache 2.0"
-    ["--project_identifier"]="com.xphost.renrsrefactor"
 )
 declare -A replacements
 while [[ $# -gt 0 ]]; do
@@ -53,7 +53,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else
     SED_INLINE="sed -i"
 fi
-find . -type f ! -path "./change.sh" -exec grep -Il . {} \; | while IFS= read -r file; do
+find . -type f ! -path "./change.sh" ! -path "./change_by_json.sh" ! -path "./ren-rs.config.json" -exec grep -Il . {} \; | while IFS= read -r file; do
     need_replace=false
     for old in "${!replacements[@]}"; do
         if grep -Fq "$old" "$file"; then

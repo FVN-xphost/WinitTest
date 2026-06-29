@@ -3,9 +3,9 @@
   "package_name": "ren-rs-refactor",
   "package_underline_name": "ren_rs_refactor",
   "project_stylized_name": "Ren Rs Refactor",
+  "package_identifier": "com.xphost.ren-rs-refactor",
   "project_author": "xphost",
   "project_description": "Ren Rs 使用 slint 完全重构之后的视觉小说引擎！",
   "project_license": "All Right Reserved (ARR)",
-  "package_version": "0.1.0",
-  "package_identifier": "com.xphost.ren-rs-refactor"
+  "package_version": "0.1.0"
 }

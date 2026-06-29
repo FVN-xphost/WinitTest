@@ -5,7 +5,7 @@ import { MyMenuButton } from "./components/my_menu_button.slint";
 export global Settings {
     in-out property <int> volume: 100;
     in-out property <int> text-speed: 100;
-    in-out property <bool> fullscreen: false;
+    in-out property <bool> is-fullscreen: false;
 }
 
 export component MainWindow inherits Window {
@@ -25,6 +25,8 @@ export component MainWindow inherits Window {
     callback save-settings();
     callback settings-clicked();
     callback return-clicked();
+
+    full-screen: Settings.is-fullscreen;
 
     Rectangle {
         property <bool> is-wide: parent.width / parent.height > 16 / 9;
@@ -159,19 +161,22 @@ export component MainWindow inherits Window {
 
                     CheckBox {
                         text: "是否全屏";
-                        checked: Settings.fullscreen;
+                        checked: Settings.is-fullscreen;
                         toggled => {
-                            Settings.fullscreen = !Settings.fullscreen;
+                            Settings.is-fullscreen = !Settings.is-fullscreen;
                             root.save-settings();
                         }
                     }
                 }
 
-                Button {
-                    text: "返回";
+                MyMenuButton {
+                    b-text: "返回";
+                    b-width: 8 * cqi;
+                    b-height: 3 * cqi;
+                    b-font-size: 2 * cqi;
                     x: parent.width - self.width - 10 * cqi;
                     y: parent.height - self.height - 6 * cqb;
-                    clicked => {
+                    b-click => {
                         root.return-clicked();
                     }
                 }

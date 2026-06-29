@@ -5,25 +5,23 @@ export component MyMenuButton inherits Rectangle {
     in property <length> b-font-size: 0px;
     in property <string> b-text: "";
     callback b-click();
-    Rectangle {
-        width: b-width;
-        height: b-height;
-        background: transparent;
-        TouchArea {
-            width: 100%;
-            height: 100%;
-            mouse-cursor: pointer;
-            clicked => {
-                b-click()
-            }
+    width: b-width;
+    height: b-height;
+    background: transparent;
+    TouchArea {
+        width: 100%;
+        height: 100%;
+        mouse-cursor: pointer;
+        clicked => {
+            b-click()
         }
+    }
 
-        GlowText {
-            text: b-text;
-            font-size: b-font-size;
-            text-color: green;
-            glow-color: lightgreen;
-            glow-opacity: 0.5;
-        }
+    GlowText {
+        text: b-text;
+        font-size: b-font-size;
+        text-color: green;
+        glow-color: lightgreen;
+        glow-opacity: 0.5;
     }
 }

@@ -16,31 +16,31 @@ fi
 OLD_PROJECT_NAME="ren-rs-refactor"
 OLD_PROJECT_UNDERLINE_NAME="ren_rs_refactor"
 OLD_PROJECT_STYLIZED_NAME="Ren Rs Refactor"
+OLD_PROJECT_IDENTIFIER="com.xphost.renrsrefactor"
 OLD_PROJECT_VERSION="0.1.0"
 OLD_PROJECT_AUTHOR="xphost <xphost@foxmail.com>"
 OLD_PROJECT_DESCRIPTION="VN Engine for Ren Rs!"
 OLD_PROJECT_LICENSE="Apache 2.0"
-OLD_PROJECT_IDENTIFIER="com.xphost.renrsrefactor"
 
 NEW_PROJECT_NAME=$(jq -r '.package_name' "$CONFIG_FILE")
 NEW_PROJECT_UNDERLINE_NAME=$(jq -r '.package_underline_name' "$CONFIG_FILE")
 NEW_PROJECT_STYLIZED_NAME=$(jq -r '.project_stylized_name' "$CONFIG_FILE")
+NEW_PROJECT_IDENTIFIER=$(jq -r '.package_identifier' "$CONFIG_FILE")
 NEW_PROJECT_VERSION=$(jq -r '.package_version' "$CONFIG_FILE")
 NEW_PROJECT_AUTHOR=$(jq -r '.project_author' "$CONFIG_FILE")
 NEW_PROJECT_DESCRIPTION=$(jq -r '.project_description' "$CONFIG_FILE")
 NEW_PROJECT_LICENSE=$(jq -r '.project_license' "$CONFIG_FILE")
-NEW_PROJECT_IDENTIFIER=$(jq -r '.package_identifier' "$CONFIG_FILE")
 
 # 将旧值映射到新值
 declare -A replacements=(
   ["$OLD_PROJECT_NAME"]="$NEW_PROJECT_NAME"
   ["$OLD_PROJECT_UNDERLINE_NAME"]="$NEW_PROJECT_UNDERLINE_NAME"
   ["$OLD_PROJECT_STYLIZED_NAME"]="$NEW_PROJECT_STYLIZED_NAME"
+  ["$OLD_PROJECT_IDENTIFIER"]="$NEW_PROJECT_IDENTIFIER"
   ["$OLD_PROJECT_VERSION"]="$NEW_PROJECT_VERSION"
   ["$OLD_PROJECT_AUTHOR"]="$NEW_PROJECT_AUTHOR"
   ["$OLD_PROJECT_DESCRIPTION"]="$NEW_PROJECT_DESCRIPTION"
   ["$OLD_PROJECT_LICENSE"]="$NEW_PROJECT_LICENSE"
-  ["$OLD_PROJECT_IDENTIFIER"]="$NEW_PROJECT_IDENTIFIER"
 )
 
 # 检查是否所有字段都有值
@@ -64,7 +64,7 @@ else
 fi
 
 # 排除当前脚本自身和 JSON 配置文件，防止配置文件中的旧值也被替换
-EXCLUDE_PATHS="! -path \"./change.sh\" ! -path \"./$CONFIG_FILE\""
+EXCLUDE_PATHS="! -path \"./change.sh\" ! -path \"./$CONFIG_FILE\" ! -path \"./change_by_json.sh\""
 
 # 替换文件内容
 find . -type f $EXCLUDE_PATHS -exec grep -Il . {} \; | while IFS= read -r file; do
