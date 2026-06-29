@@ -4,6 +4,8 @@ mod utils;
 
 use utils::config::Config;
 use utils::constant::*;
+#[cfg(not(target_os = "android"))]
+use utils::path::set_config_local_dir;
 // use std::fs;
 // use std::path::PathBuf;
 use std::time::Duration;
@@ -134,6 +136,7 @@ fn init_logging() {
 #[cfg(not(target_os = "android"))]
 pub fn desktop_main() {
     init_logging();
+    set_config_local_dir();
     run().expect("Lifecycle run started is failed in Desktop!");
 }
 // Android 入口
@@ -141,6 +144,13 @@ pub fn desktop_main() {
 #[unsafe(no_mangle)]
 pub fn android_main(app: slint::android::android_activity::AndroidApp) {
     init_logging();
+    if let Some(path) = app.internal_data_path() {
+        utils::path::CONFIG_LOCAL_DIR
+            .set()
+            .expect("Lifecycle run set config local dir is failed in Android!");
+    } else {
+        panic!("Lifecycle run get internal data path is failed in Android");
+    }
     slint::android::init(app).expect("Lifecycle run init is failed in Android!");
     run().expect("Lifecycle run started is failed in Android!");
 }
@@ -150,5 +160,6 @@ pub fn android_main(app: slint::android::android_activity::AndroidApp) {
 #[unsafe(no_mangle)]
 pub extern "C" fn ios_main() {
     init_logging();
+    set_config_local_dir();
     run().expect("Lifecycle run started is failed in iOS!");
 }
