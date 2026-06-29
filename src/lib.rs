@@ -145,7 +145,7 @@ pub fn android_main(app: slint::android::android_activity::AndroidApp) {
     init_logging();
     if let Some(path) = app.internal_data_path() {
         utils::path::CONFIG_LOCAL_DIR
-            .set()
+            .set(path)
             .expect("Lifecycle run set config local dir is failed in Android!");
     } else {
         panic!("Lifecycle run get internal data path is failed in Android");
